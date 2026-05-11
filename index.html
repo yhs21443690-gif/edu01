@@ -3,428 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>능동형 자동 개폐식 환기 시스템 - 발명의 시작</title>
+    <title>독도 바로알기 통합 가이드</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         
-        :root {
-            --primary-red: #ef4444;
-            --primary-blue: #3b82f6;
-            --bg-dark: #0f172a;
+        /* Splash Screen Animation */
+        #welcome-screen {
+            transition: opacity 0.8s ease, visibility 0.8s;
         }
-
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: var(--bg-dark);
-            color: #f8fafc;
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
-        }
-
-        /* Animations */
-        .fade-in {
+        .fade-out {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
         }
+
+        /* Map Styles */
+        .map-container { position: relative; width: 100%; height: 300px; background: #e0f2fe; border-radius: 1rem; overflow: hidden; }
+        .island { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; transition: all 0.3s; cursor: pointer; }
+        .island:hover { transform: scale(1.1); }
         
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .alarm-flash {
-            animation: flashRed 0.8s infinite alternate;
-        }
-
-        @keyframes flashRed {
-            0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); }
-            100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); border-color: #ef4444; }
-        }
-
-        /* Flip Card Logic */
-        .flip-card {
-            perspective: 1000px;
-            height: 320px;
-        }
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-        }
-        .flipped .flip-card-inner {
-            transform: rotateY(180deg);
-        }
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 2.5rem;
-        }
-        .flip-card-front {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .flip-card-back {
-            background: linear-gradient(145deg, #7f1d1d, #450a0a);
-            transform: rotateY(180deg);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .progress-bar-fill {
-            width: 0;
-            transition: width 2.5s cubic-bezier(0.1, 0.8, 0.2, 1);
-        }
-
-        /* Decorative background elements */
-        .blob {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(15, 23, 42, 0) 70%);
-            border-radius: 50%;
-            z-index: -1;
-            filter: blur(40px);
-        }
+        /* Custom UI Elements */
+        .card { transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-slate-50 text-slate-800">
 
-    <!-- Scroll Progress Bar -->
-    <div class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-red-600 to-blue-600 z-50 transition-all duration-100" id="scroll-progress" style="width: 0%"></div>
-
-    <!-- Hero Section -->
-    <section class="min-h-screen flex flex-col justify-center items-center text-center p-6 relative overflow-hidden">
-        <div class="blob" style="top: -100px; left: -100px;"></div>
-        <div class="blob" style="bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, rgba(15, 23, 42, 0) 70%);"></div>
+    <!-- Splash Screen (Start Exploration) -->
+    <div id="welcome-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-blue-900 overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute -top-20 -left-20 w-64 h-64 bg-blue-800 rounded-full opacity-50"></div>
+        <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-blue-700 rounded-full opacity-30"></div>
         
-        <div class="z-10 fade-in">
-            <span class="inline-block px-4 py-1.5 rounded-full bg-red-500/10 text-red-500 font-bold tracking-widest text-xs mb-6 border border-red-500/20 uppercase">The Origin of Innovation</span>
-            <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tight">
-                치명적 한계를 극복하는<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-500">가장 능동적인 해답</span>
-            </h1>
-            <p class="text-lg md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12 font-light leading-relaxed">
-                한밤중 캠핑장에서 겪은 아찔한 실화가 어떻게<br class="hidden md:block"> 수천 명의 생명을 구하는 혁신적 발명으로 진화했는지 확인해 보세요.
+        <div class="relative z-10 text-center px-4">
+            <div class="mb-6 inline-block p-4 bg-white/10 rounded-full backdrop-blur-md">
+                <span class="text-6xl">🏝️</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">독도 탐험 시작하기</h1>
+            <p class="text-blue-200 text-lg md:text-xl mb-12 max-w-2xl mx-auto">
+                우리 땅 독도의 지리, 역사, 그리고 평화를 향한 이야기까지<br>
+                지금부터 함께 탐험을 시작해볼까요?
             </p>
-            <div class="flex flex-col items-center">
-                <a href="#incident" class="flex flex-col items-center gap-3 text-gray-500 hover:text-white transition-all group">
-                    <span class="text-sm tracking-widest uppercase font-bold group-hover:translate-y-1 transition-transform">Story Start</span>
-                    <i class="fas fa-chevron-down text-2xl animate-bounce"></i>
+            
+            <!-- Button Group -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="startExploration()" class="group relative px-10 py-5 bg-white text-blue-900 font-bold text-xl rounded-full shadow-2xl hover:bg-blue-50 transform hover:scale-105 transition-all duration-300">
+                    탐험 시작
+                    <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                </button>
+                
+                <a href="./01/index.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
+                    📅 독도연표
+                </a>
+                
+                <a href="./02/02.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
+                    📖 독도용어
                 </a>
             </div>
         </div>
-    </section>
-
-    <!-- Section 1: The Incident -->
-    <section id="incident" class="min-h-screen flex items-center justify-center p-6 relative">
-        <div class="max-w-5xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
-            <div class="order-2 md:order-1 fade-in">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="h-px w-8 bg-red-500"></div>
-                    <span class="text-red-500 font-black text-sm uppercase tracking-tighter">01. Real Experience</span>
-                </div>
-                <h3 class="text-4xl font-bold mb-8 leading-snug">겨울 캠핑장,<br>텐트 안을 가득 채운 경보음</h3>
-                <p class="text-gray-400 text-lg mb-8 leading-relaxed">
-                    가족과 함께한 행복했던 겨울 캠핑. 난로를 켜둔 고요한 텐트 안에서 갑자기 <span class="text-white font-semibold">일산화탄소 경보기</span>가 비명을 지르듯 울렸습니다. 운 좋게 깨어 있어 즉시 환기할 수 있었지만, 그때 밀려온 공포는 질문이 되었습니다.
-                </p>
-                
-                <div class="space-y-4">
-                    <button id="alarm-btn" class="group relative w-full md:w-auto px-8 py-4 bg-red-600 rounded-xl font-bold text-white transition-all hover:bg-red-700 active:scale-95 shadow-xl shadow-red-900/20 flex items-center justify-center gap-3">
-                        <i class="fas fa-bell animate-ring group-hover:rotate-12 transition-transform"></i>
-                        위기 상황 재현하기
-                    </button>
-                    
-                    <div id="hidden-question" class="hidden opacity-0 translate-y-4 transition-all duration-1000 p-6 glass-panel border-l-4 border-l-red-500">
-                        <p class="font-bold text-red-100 text-xl italic leading-relaxed">
-                            "만약 노이즈 캔슬링 이어폰을 끼고 자거나,<br>
-                            깊이 잠든 새벽이었다면 경보음을 듣고 깰 수 있었을까?"
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="order-1 md:order-2 flex justify-center fade-in">
-                <div id="tent-visual" class="w-72 h-72 md:w-80 md:h-80 bg-slate-800 rounded-3xl flex items-center justify-center border border-slate-700 transition-all duration-700 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
-                    <i class="fas fa-campground text-8xl text-slate-400 z-10 transition-transform group-hover:scale-110"></i>
-                    <div class="absolute top-4 right-4 bg-slate-900/80 px-3 py-1 rounded-full border border-white/5 text-[10px] font-bold text-slate-500">INTERNAL VIEW</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 2: Limitations -->
-    <section id="limitations" class="min-h-screen flex flex-col justify-center items-center p-6 bg-slate-900/30">
-        <div class="max-w-6xl mx-auto w-full">
-            <div class="text-center mb-16 fade-in">
-                <span class="text-red-500 font-black text-sm uppercase tracking-tighter block mb-2">02. Problem Analysis</span>
-                <h3 class="text-4xl md:text-5xl font-black mb-6">소리 경보기의 치명적 한계</h3>
-                <p class="text-gray-400 text-lg">기존 방식이 결코 해결할 수 없는 두 가지 결정적 결함을 발견했습니다.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-10">
-                <!-- Limit 1 -->
-                <div class="flip-card fade-in" style="transition-delay: 100ms;">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front" onclick="this.parentElement.parentElement.classList.toggle('flipped')">
-                            <div class="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mb-6 border border-white/5">
-                                <i class="fas fa-headphones-slash text-3xl text-red-400"></i>
-                            </div>
-                            <h4 class="text-2xl font-bold mb-3">청각적 한계</h4>
-                            <p class="text-gray-500 text-center text-sm">편리한 기술이 가져온 역설</p>
-                            <span class="mt-8 text-xs text-slate-600 font-bold flex items-center gap-2">
-                                <i class="fas fa-mouse-pointer"></i> 클릭하여 분석 보기
-                            </span>
-                        </div>
-                        <div class="flip-card-back" onclick="this.parentElement.parentElement.classList.toggle('flipped')">
-                            <h4 class="text-xl font-bold mb-4 flex items-center gap-2">
-                                <i class="fas fa-info-circle"></i> 소음 차단 기술의 위험
-                            </h4>
-                            <p class="text-base leading-relaxed text-red-50/80 text-center">
-                                최근 고성능 노이즈 캔슬링 이어폰이나 귀마개를 사용하는 캠핑객이 급증했습니다. 주변 소음을 지워주는 이 기술은 역설적으로 <span class="font-bold text-white underline underline-offset-4 decoration-red-500">생명을 구해야 할 경보음까지 완벽히 차단</span>하는 모순을 낳습니다.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Limit 2 -->
-                <div class="flip-card fade-in" style="transition-delay: 300ms;">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front" onclick="this.parentElement.parentElement.classList.toggle('flipped')">
-                            <div class="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mb-6 border border-white/5">
-                                <i class="fas fa-lungs-virus text-3xl text-orange-400"></i>
-                            </div>
-                            <h4 class="text-2xl font-bold mb-3">신체적 한계</h4>
-                            <p class="text-gray-500 text-center text-sm">들어도 대응할 수 없는 기전</p>
-                            <span class="mt-8 text-xs text-slate-600 font-bold flex items-center gap-2">
-                                <i class="fas fa-mouse-pointer"></i> 클릭하여 분석 보기
-                            </span>
-                        </div>
-                        <div class="flip-card-back" onclick="this.parentElement.parentElement.classList.toggle('flipped')">
-                            <h4 class="text-xl font-bold mb-4 flex items-center gap-2">
-                                <i class="fas fa-skull-crossbones"></i> 신체 마비 현상
-                            </h4>
-                            <p class="text-base leading-relaxed text-red-50/80 text-center">
-                                일산화탄소는 산소보다 헤모글로빈 결합력이 약 <span class="font-bold text-white">250배</span>나 강합니다. 경보음을 듣고 깨어나더라도 이미 뇌와 근육이 마비되어 <span class="font-bold text-white underline underline-offset-4 decoration-red-500">스스로 텐트 지퍼를 열 수 없는 최악의 상황</span>에 직면하게 됩니다.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 3: The Innovation Idea -->
-    <section id="idea" class="min-h-screen flex items-center justify-center p-6 relative">
-        <div class="blob" style="top: 20%; right: 10%; background: radial-gradient(circle, rgba(234, 179, 8, 0.05) 0%, rgba(15, 23, 42, 0) 70%);"></div>
-        <div class="max-w-4xl mx-auto w-full fade-in">
-            <div class="glass-panel p-10 md:p-16 border-t-4 border-t-yellow-500 relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 opacity-5">
-                    <i class="fas fa-lightbulb text-[20rem]"></i>
-                </div>
-                
-                <h2 class="text-sm text-yellow-500 font-black mb-6 uppercase tracking-widest">03. Invention Motivation</h2>
-                <h3 class="text-3xl md:text-4xl font-bold mb-10 leading-snug">전문가의 권고와<br>치명적 모순 사이의 해답</h3>
-                
-                <div class="space-y-8 text-lg text-gray-300 relative z-10">
-                    <div class="flex items-start gap-5">
-                        <div class="w-10 h-10 rounded-full bg-blue-500/20 flex-shrink-0 flex items-center justify-center">
-                            <i class="fas fa-check text-blue-400"></i>
-                        </div>
-                        <p>서울대병원 등 의료계는 <strong>'즉각적인 환기'</strong>가 중독 상황에서의 유일한 생존법임을 강조합니다.</p>
-                    </div>
-                    <div class="flex items-start gap-5">
-                        <div class="w-10 h-10 rounded-full bg-red-500/20 flex-shrink-0 flex items-center justify-center">
-                            <i class="fas fa-times text-red-400"></i>
-                        </div>
-                        <p>하지만 마비된 몸으로는 환기를 수행할 수 없다는 <strong>'명백한 모순'</strong>이 존재합니다.</p>
-                    </div>
-                </div>
-
-                <div class="mt-14 p-8 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-white/5 shadow-2xl">
-                    <h4 class="text-2xl md:text-3xl font-black text-center leading-tight">
-                        "사람이 문을 열 수 없다면,<br>
-                        <span class="text-blue-500">장치가 스스로 지퍼를 열면 어떨까?</span>"
-                    </h4>
-                    <p class="text-center mt-4 text-slate-500 font-medium">수동적 경보에서 능동적 환기로의 패러다임 전환</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 4: Data & Statistics -->
-    <section id="data" class="min-h-screen flex flex-col justify-center items-center p-6 bg-slate-900/50">
-        <div class="max-w-5xl mx-auto w-full fade-in">
-            <div class="text-center mb-16">
-                <span class="text-green-500 font-black text-sm uppercase tracking-tighter block mb-2">04. Empirical Data</span>
-                <h3 class="text-4xl md:text-5xl font-black">1,120명의 응답이 말해주는 당위성</h3>
-                <p class="text-gray-400 mt-6 text-lg">시민들은 이미 기존 방식의 한계를 인지하고 대안을 갈구하고 있습니다.</p>
-            </div>
-
-            <div class="grid gap-12">
-                <!-- Stat 1 -->
-                <div class="space-y-4">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-2">
-                        <span class="text-xl font-bold">수면/이어폰 사용 시 스스로 환기할 자신이 <span class="text-red-500">없음</span></span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-black text-red-500 counter" data-target="83.2">0</span>
-                            <span class="text-2xl font-bold text-red-500">%</span>
-                        </div>
-                    </div>
-                    <div class="w-full bg-slate-800 rounded-full h-8 overflow-hidden p-1 border border-white/5">
-                        <div class="bg-gradient-to-r from-red-600 to-red-400 h-full rounded-full progress-bar-fill shadow-[0_0_15px_rgba(239,68,68,0.3)]" data-width="83.2%"></div>
-                    </div>
-                </div>
-
-                <!-- Stat 2 -->
-                <div class="space-y-4">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-2">
-                        <span class="text-xl font-bold">기계의 자동 개방 시스템이 <span class="text-blue-500">필요함</span></span>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-black text-blue-500 counter" data-target="73.9">0</span>
-                            <span class="text-2xl font-bold text-blue-500">%</span>
-                        </div>
-                    </div>
-                    <div class="w-full bg-slate-800 rounded-full h-8 overflow-hidden p-1 border border-white/5">
-                        <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full progress-bar-fill shadow-[0_0_15px_rgba(59,130,246,0.3)]" data-width="73.9%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final Section -->
-    <section class="min-h-screen flex flex-col justify-center items-center p-6 text-center relative">
-        <div class="blob" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(15, 23, 42, 0) 70%);"></div>
         
-        <div class="z-10 fade-in w-full max-w-4xl px-4">
-            <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl rotate-12">
-                <i class="fas fa-shield-heart text-3xl text-white"></i>
-            </div>
-            <h2 class="text-2xl md:text-3xl font-medium mb-10 text-slate-300 leading-relaxed">
-                단순한 소리 알림을 넘어,<br class="hidden md:block"> 골든타임 내에 생명의 문을 직접 여는 혁신
-            </h2>
-            
-            <div class="h-px w-32 bg-slate-700 mx-auto mb-10"></div>
-            
-            <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight">
-                <span class="text-transparent bg-clip-text bg-gradient-to-br from-green-300 via-blue-500 to-indigo-600">능동형 자동 개폐식</span><br>
-                환기 시스템
-            </h1>
-            
-            <p class="text-xl text-slate-500 mb-16 font-medium">실제 캠핑의 날카로운 통찰이 안전의 새로운 기준이 됩니다.</p>
-            
-            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-10 py-4 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-300 font-bold transition-all border border-white/5 hover:border-white/20 flex items-center gap-3 mx-auto">
-                <i class="fas fa-chevron-up"></i>
-                처음으로
-            </button>
+        <!-- Wave Effect at Bottom -->
+        <div class="absolute bottom-0 w-full overflow-hidden leading-[0]">
+            <svg class="relative block w-[calc(100%+1.3px)] h-[150px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#F8FAFC"></path>
+            </svg>
         </div>
-    </section>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content">
+        <!-- Header -->
+        <header class="bg-blue-700 text-white py-8 shadow-lg">
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-4xl font-bold mb-2">우리 땅, 독도 바로알기</h1>
+                <p class="text-blue-100">지리적 특성부터 역사적 사료, 평화적 해결까지</p>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-white border-b sticky top-0 z-50">
+            <div class="container mx-auto px-4">
+                <ul class="flex overflow-x-auto whitespace-nowrap justify-center">
+                    <li><button onclick="showTab('geo')" class="tab-btn px-6 py-4 font-bold border-b-2 border-blue-700 text-blue-700" id="btn-geo">1. 지리적 특성</button></li>
+                    <li><button onclick="showTab('history')" class="tab-btn px-6 py-4 font-bold border-b-2 border-transparent text-slate-500 hover:text-blue-600" id="btn-history">2. 역사적 사료</button></li>
+                    <li><button onclick="showTab('peace')" class="tab-btn px-6 py-4 font-bold border-b-2 border-transparent text-slate-500 hover:text-blue-600" id="btn-peace">3. 갈등과 평화</button></li>
+                    <li><button onclick="showTab('quiz')" class="tab-btn px-6 py-4 font-bold border-b-2 border-transparent text-slate-500 hover:text-blue-600" id="btn-quiz">4. 자가 진단</button></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="container mx-auto px-4 py-8 max-w-5xl">
+
+            <!-- Section 1: Geography -->
+            <section id="geo" class="tab-content active space-y-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                        <span class="mr-2">📍</span> 독도의 위치와 환경
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <div class="map-container mb-4 flex items-center justify-center">
+                                 <div class="relative w-full h-full p-10">
+                                     <div class="island bg-slate-400 w-16 h-16 top-20 left-10" title="대한민국">육지</div>
+                                     <div class="island bg-blue-500 w-10 h-10 top-16 left-48" title="울릉도">울릉</div>
+                                     <div class="island bg-red-500 w-6 h-6 top-28 left-72 shadow-lg animate-pulse" title="독도">독도</div>
+                                     <div class="island bg-orange-400 w-10 h-10 bottom-10 right-10" title="오키섬">오키</div>
+                                     
+                                     <div class="absolute top-14 left-32 text-xs font-bold text-slate-600">87.4km</div>
+                                     <div class="absolute top-36 left-72 text-xs font-bold text-slate-600">157.5km</div>
+                                 </div>
+                            </div>
+                            <p class="text-sm text-slate-500 italic text-center">울릉도에서 독도는 87.4km 거리로, 맑은 날 육안으로 확인 가능합니다.</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 p-4 rounded-xl">
+                                <h3 class="font-bold text-blue-700 mb-2">행정 구역 및 주소</h3>
+                                <ul class="text-sm space-y-1">
+                                    <li><strong>동도:</strong> 경상북도 울릉군 울릉읍 독도리 이사부길</li>
+                                    <li><strong>서도:</strong> 경상북도 울릉군 울릉읍 독도리 안용복길</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <h3 class="font-bold text-slate-700 mb-2">지리적 규모</h3>
+                                <p class="text-sm">전체 면적은 약 <strong>187,554m²</strong>로, 서울 잠실운동장의 약 2배 넓이입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 card">
+                        <div class="text-3xl mb-2">🌋</div>
+                        <h3 class="font-bold text-lg mb-2">화산섬의 탄생</h3>
+                        <p class="text-sm text-slate-600">약 460만~250만 년 전 화산 활동으로 형성되었습니다. 울릉도, 제주도보다 먼저 태어난 형님 섬입니다.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 card">
+                        <div class="text-3xl mb-2">💎</div>
+                        <h3 class="font-bold text-lg mb-2">자원의 보고</h3>
+                        <p class="text-sm text-slate-600">'불타는 얼음' 가스 하이드레이트가 약 6억 톤 매장되어 있으며, 한류와 난류가 만나는 황금어장입니다.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 card">
+                        <div class="text-3xl mb-2">🛡️</div>
+                        <h3 class="font-bold text-lg mb-2">지정학적 가치</h3>
+                        <p class="text-sm text-slate-600">러시아, 일본의 한가운데 위치한 중요한 방위 거점이자 해상 운송의 요충지입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: History -->
+            <section id="history" class="tab-content space-y-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-indigo-800 mb-6 flex items-center">
+                        <span class="mr-2">📜</span> 기록이 증명하는 우리 독도
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                            <h3 class="font-bold text-lg text-indigo-700">한국의 주요 사료</h3>
+                            <div class="mt-4 grid gap-4">
+                                <div class="bg-indigo-50 p-4 rounded-lg">
+                                    <span class="text-xs font-bold bg-indigo-200 text-indigo-700 px-2 py-1 rounded">1454년</span>
+                                    <p class="font-bold mt-1">세종실록지리지</p>
+                                    <p class="text-sm mt-1">"우산(독도)과 무릉(울릉) 두 섬은 서로 거리가 멀지 않아 날씨가 맑으면 바라볼 수 있다."</p>
+                                </div>
+                                <div class="bg-indigo-50 p-4 rounded-lg">
+                                    <span class="text-xs font-bold bg-indigo-200 text-indigo-700 px-2 py-1 rounded">1900년</span>
+                                    <p class="font-bold mt-1">대한제국 칙령 제41호</p>
+                                    <p class="text-sm mt-1">울릉도를 '울도군'으로 승격시키고 독도(석도)를 관할 구역으로 명문화함.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-red-500 pl-4 py-2">
+                            <h3 class="font-bold text-lg text-red-700">일본의 자인(自認) 사료</h3>
+                            <div class="mt-4 grid gap-4">
+                                <div class="bg-red-50 p-4 rounded-lg">
+                                    <span class="text-xs font-bold bg-red-200 text-red-700 px-2 py-1 rounded">1877년</span>
+                                    <p class="font-bold mt-1">태정관 지령</p>
+                                    <p class="text-sm mt-1 text-red-800">"울릉도 외 1도(독도)는 일본과 관계가 없음을 명심할 것" - 일본 최고 행정기관의 공식 문서</p>
+                                </div>
+                                <div class="bg-red-50 p-4 rounded-lg">
+                                    <span class="text-xs font-bold bg-red-200 text-red-700 px-2 py-1 rounded">1667년</span>
+                                    <p class="font-bold mt-1">은주시청합기</p>
+                                    <p class="text-sm mt-1">일본의 북서쪽 경계를 '오키섬'으로 한정하여 독도가 일본 영토가 아님을 시사함.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 text-white p-8 rounded-2xl shadow-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-white text-slate-800 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mr-4">안</div>
+                        <div>
+                            <h3 class="text-xl font-bold">독도 수호 영웅: 안용복</h3>
+                            <p class="text-slate-400 text-sm">조선 숙종 시대의 민간 외교관</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        1693년과 1696년 두 차례 일본으로 건너가 울릉도와 독도가 조선의 영토임을 확약받았습니다. 그의 활약으로 일본 막부는 '울릉도 도해 금지령'을 내렸으며, 이는 독도가 우리 영토임을 일본이 인정한 결정적 계기가 되었습니다.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 3: Conflict & Peace -->
+            <section id="peace" class="tab-content space-y-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-emerald-800 mb-6 flex items-center">
+                        <span class="mr-2">🤝</span> 갈등을 넘어 평화로
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-lg border-b pb-2">갈등의 역사적 배경</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-start">
+                                    <div class="bg-emerald-100 text-emerald-700 font-bold px-2 py-1 rounded text-xs mr-3 mt-1">1946</div>
+                                    <p class="text-sm"><strong>SCAPIN 제677호:</strong> 연합국 사령부가 독도를 일본의 통치 범위에서 제외함.</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="bg-emerald-100 text-emerald-700 font-bold px-2 py-1 rounded text-xs mr-3 mt-1">1952</div>
+                                    <p class="text-sm"><strong>이승만 라인:</strong> 평화선을 선포하여 독도 영유권을 대내외에 확고히 함.</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="bg-red-100 text-red-700 font-bold px-2 py-1 rounded text-xs mr-3 mt-1">현재</div>
+                                    <p class="text-sm text-red-700">일본의 독도 영유권 주장 교육 및 '다케시마의 날' 제정으로 인한 갈등 지속.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-emerald-50 p-6 rounded-2xl">
+                            <h3 class="font-bold text-emerald-800 mb-4">우리가 나아가야 할 길</h3>
+                            <ul class="text-sm space-y-4">
+                                <li class="flex items-start">
+                                    <span class="text-emerald-500 mr-2">✔</span>
+                                    <span><strong>논리적 무장:</strong> 감정적 대응보다는 정확한 역사적 사실과 국제법적 지식을 갖추기</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-emerald-500 mr-2">✔</span>
+                                    <span><strong>민간 교류:</strong> 한일 양국 학생들 간의 역사 공동 연구 및 체험 캠프 활성화</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-emerald-500 mr-2">✔</span>
+                                    <span><strong>평화적 관점:</strong> 영토 분쟁의 프레임을 넘어 동아시아 공동 번영과 평화의 관점으로 접근</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <h3 class="text-xl font-bold mb-4 italic">"독도는 우리가 지키는 것이 아니라, 독도가 우리 동해를 지키는 것입니다."</h3>
+                    <div class="flex justify-center space-x-4">
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <p class="text-xs text-slate-500">독도 의용수비대</p>
+                            <p class="font-bold">1953년 결성</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <p class="text-xs text-slate-500">독도 경비대</p>
+                            <p class="font-bold">상시 주둔</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <p class="text-xs text-slate-500">최초 주민</p>
+                            <p class="font-bold">최종덕 님</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quiz -->
+            <section id="quiz" class="tab-content">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6">독도 지식 퀴즈 📝</h2>
+                    <div id="quiz-container" class="space-y-6">
+                        <div id="question-box">
+                            <p class="text-lg font-bold mb-4" id="q-text">1. 다음 중 독도의 행정 구역상 주소는 어디일까요?</p>
+                            <div class="grid gap-3">
+                                <button onclick="checkAnswer(0)" class="option-btn text-left p-4 rounded-xl border border-slate-200 hover:bg-blue-50 transition">A. 강원도 울릉군 울릉읍</button>
+                                <button onclick="checkAnswer(1)" class="option-btn text-left p-4 rounded-xl border border-slate-200 hover:bg-blue-50 transition">B. 경상북도 울릉군 울릉읍</button>
+                                <button onclick="checkAnswer(2)" class="option-btn text-left p-4 rounded-xl border border-slate-200 hover:bg-blue-50 transition">C. 울산광역시 울릉군</button>
+                            </div>
+                        </div>
+                        <div id="feedback" class="hidden p-4 rounded-xl font-bold"></div>
+                        <button id="next-btn" onclick="nextQuestion()" class="hidden bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-800 transition">다음 문제</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="bg-slate-100 border-t py-12">
+            <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
+                <p class="mb-2">본 가이드는 제공된 교육 자료(1~3차시)를 기반으로 제작되었습니다.</p>
+                <p>&copy; 2024 독도 바로알기 교육 플랫폼</p>
+            </div>
+        </footer>
+    </div>
 
     <script>
-        // Use window.onload to ensure all resources are ready
+        function startExploration() {
+            const screen = document.getElementById('welcome-screen');
+            screen.classList.add('fade-out');
+            document.body.style.overflow = 'auto';
+            setTimeout(() => {
+                screen.style.display = 'none';
+            }, 800);
+        }
+
         window.onload = function() {
-            // Scroll Progress
-            window.addEventListener('scroll', () => {
-                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                const scrolled = (winScroll / height) * 100;
-                document.getElementById('scroll-progress').style.width = scrolled + '%';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-700', 'text-blue-700');
+                btn.classList.add('border-transparent', 'text-slate-500');
             });
 
-            // Intersection Observer
-            const observerOptions = {
-                threshold: 0.2
-            };
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('border-blue-700', 'text-blue-700');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        
-                        // If it's the data section, trigger counter and bars
-                        if (entry.target.id === 'data') {
-                            animateCounters();
-                            animateProgressBars();
-                        }
-                    }
-                });
-            }, observerOptions);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-            document.querySelectorAll('.fade-in, section').forEach(el => observer.observe(el));
+        const questions = [
+            {
+                q: "1. 다음 중 독도의 행정 구역상 주소는 어디일까요?",
+                options: ["강원도 울릉군 울릉읍", "경상북도 울릉군 울릉읍", "울산광역시 울릉군"],
+                answer: 1,
+                hint: "독도는 경상북도 소속입니다."
+            },
+            {
+                q: "2. 1877년 독도가 일본 영토가 아님을 인정한 일본의 공식 문서는?",
+                options: ["은주시청합기", "시마네현 고시 제40호", "태정관 지령"],
+                answer: 2,
+                hint: "태정관은 당시 일본 최고의 행정기관이었습니다."
+            },
+            {
+                q: "3. 독도의 전체 면적은 잠실 운동장의 몇 배 정도일까요?",
+                options: ["약 1배", "약 2배", "약 5배"],
+                answer: 1,
+                hint: "187,554m² 입니다."
+            }
+        ];
 
-            // Interaction: Alarm Button
-            const alarmBtn = document.getElementById('alarm-btn');
-            const hiddenQuestion = document.getElementById('hidden-question');
-            const tentVisual = document.getElementById('tent-visual');
+        let currentQ = 0;
 
-            alarmBtn.addEventListener('click', () => {
-                alarmBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 위험 상황 감지됨!';
-                alarmBtn.classList.replace('bg-red-600', 'bg-red-900');
-                
-                hiddenQuestion.classList.remove('hidden');
-                setTimeout(() => {
-                    hiddenQuestion.classList.replace('opacity-0', 'opacity-100');
-                    hiddenQuestion.classList.replace('translate-y-4', 'translate-y-0');
-                }, 50);
-                
-                tentVisual.classList.add('alarm-flash');
-                tentVisual.innerHTML = '<i class="fas fa-campground text-8xl text-red-500 z-10 scale-110 transition-transform"></i><div class="absolute inset-0 bg-red-500/20 z-0"></div>';
+        function checkAnswer(idx) {
+            const feedback = document.getElementById('feedback');
+            const btns = document.querySelectorAll('.option-btn');
+            
+            btns.forEach(b => b.disabled = true);
+
+            if (idx === questions[currentQ].answer) {
+                feedback.textContent = "정답입니다! 🎉";
+                feedback.className = "p-4 rounded-xl font-bold bg-emerald-100 text-emerald-700 block";
+                btns[idx].classList.add('bg-emerald-100', 'border-emerald-500');
+            } else {
+                feedback.textContent = "아쉽네요. 정답은 '" + questions[currentQ].options[questions[currentQ].answer] + "' 입니다. (" + questions[currentQ].hint + ")";
+                feedback.className = "p-4 rounded-xl font-bold bg-red-100 text-red-700 block";
+                btns[idx].classList.add('bg-red-100', 'border-red-500');
+            }
+
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQ++;
+            if (currentQ >= questions.length) {
+                document.getElementById('quiz-container').innerHTML = "<div class='text-center py-10'><h3 class='text-2xl font-bold mb-4'>학습을 완료했습니다! 🎖️</h3><p>독도에 대한 올바른 지식으로 우리 땅을 지키는 힘을 길러보아요.</p></div>";
+                return;
+            }
+
+            document.getElementById('q-text').textContent = questions[currentQ].q;
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach((btn, i) => {
+                btn.disabled = false;
+                btn.textContent = (i === 0 ? "A. " : i === 1 ? "B. " : "C. ") + questions[currentQ].options[i];
+                btn.className = "option-btn text-left p-4 rounded-xl border border-slate-200 hover:bg-blue-50 transition";
             });
-
-            // Stats Animation
-            let statsTriggered = false;
-            function animateCounters() {
-                if (statsTriggered) return;
-                statsTriggered = true;
-                
-                document.querySelectorAll('.counter').forEach(counter => {
-                    const target = parseFloat(counter.getAttribute('data-target'));
-                    const duration = 2500;
-                    let startTime = null;
-
-                    const animation = (currentTime) => {
-                        if (!startTime) startTime = currentTime;
-                        const progress = Math.min((currentTime - startTime) / duration, 1);
-                        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                        counter.innerText = (easeOutQuart * target).toFixed(1);
-                        if (progress < 1) requestAnimationFrame(animation);
-                        else counter.innerText = target;
-                    };
-                    requestAnimationFrame(animation);
-                });
-            }
-
-            function animateProgressBars() {
-                document.querySelectorAll('.progress-bar-fill').forEach(bar => {
-                    bar.style.width = bar.getAttribute('data-width');
-                });
-            }
-        };
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
