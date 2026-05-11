@@ -21,6 +21,15 @@
             pointer-events: none;
         }
 
+        /* 모달(팝업) 스타일 */
+        #modal-overlay {
+            transition: all 0.3s ease;
+            display: none;
+        }
+        #modal-overlay.active {
+            display: flex;
+        }
+
         /* 지도 및 카드 디자인 */
         .map-container { position: relative; width: 100%; height: 300px; background: #e0f2fe; border-radius: 1rem; overflow: hidden; }
         .island { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; transition: all 0.3s; cursor: pointer; }
@@ -33,36 +42,47 @@
 
     <!-- [1] 시작 화면 (Welcome Screen) -->
     <div id="welcome-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-blue-900 overflow-hidden">
-        <!-- 배경 장식 요소 -->
         <div class="absolute -top-20 -left-20 w-64 h-64 bg-blue-800 rounded-full opacity-50"></div>
         <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-blue-700 rounded-full opacity-30"></div>
         
-        <div class="relative z-10 text-center px-4">
+        <div class="relative z-10 text-center px-4 max-w-4xl">
             <div class="mb-6 inline-block p-4 bg-white/10 rounded-full backdrop-blur-md">
                 <span class="text-6xl">🏝️</span>
             </div>
             <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">독도 탐험 시작하기</h1>
-            <p class="text-blue-200 text-lg md:text-xl mb-12 max-w-2xl mx-auto">
+            <p class="text-blue-200 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
                 지리적 특성부터 역사적 사료, 평화적 해결까지<br>
                 우리 땅 독도의 모든 것을 함께 알아볼까요?
             </p>
             
             <!-- 버튼 그룹 -->
-            <div class="flex flex-wrap justify-center gap-4">
-                <!-- 메인 콘텐츠 탐험 시작 -->
-                <button onclick="startExploration()" class="group relative px-10 py-5 bg-white text-blue-900 font-bold text-xl rounded-full shadow-2xl hover:bg-blue-50 transform hover:scale-105 transition-all duration-300">
-                    탐험 시작
-                    <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
-                </button>
-                
-                <!-- 외부 페이지 링크 (01, 02 폴더) -->
-                <a href="./01/index.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
-                    📅 독도연표
-                </a>
-                
-                <a href="./02/02.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
-                    📖 독도용어
-                </a>
+            <div class="flex flex-col gap-4">
+                <!-- 첫 번째 줄: 주요 네비게이션 -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="startExploration()" class="group relative px-10 py-5 bg-white text-blue-900 font-bold text-xl rounded-full shadow-2xl hover:bg-blue-50 transform hover:scale-105 transition-all duration-300">
+                        탐험 시작
+                        <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                    </button>
+                    
+                    <a href="./01/index.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
+                        📅 독도연표
+                    </a>
+                    
+                    <a href="./02/02.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
+                        📖 독도용어
+                    </a>
+                </div>
+
+                <!-- 두 번째 줄: 시각 자료 팝업 (요청하신 부분) -->
+                <div class="flex flex-wrap justify-center gap-4 mt-2">
+                    <button onclick="openModal('image')" class="px-8 py-4 bg-emerald-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-emerald-500 transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                        📊 인포그래픽 보기
+                    </button>
+                    
+                    <button onclick="openModal('video')" class="px-8 py-4 bg-red-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-red-500 transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                        🎬 동영상 보기
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -74,11 +94,23 @@
         </div>
     </div>
 
+    <!-- [팝업 모달 영역] -->
+    <div id="modal-overlay" class="fixed inset-0 z-[200] bg-black/80 items-center justify-center p-4">
+        <div class="bg-white rounded-3xl overflow-hidden max-w-4xl w-full relative shadow-2xl">
+            <!-- 닫기 버튼 -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-[210] bg-black/50 hover:bg-black text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl transition-all">
+                &times;
+            </button>
+            
+            <div id="modal-content" class="w-full flex items-center justify-center min-h-[300px]">
+                <!-- 콘텐츠가 JS로 주입됩니다 -->
+            </div>
+        </div>
+    </div>
+
     <!-- [2] 메인 콘텐츠 영역 -->
     <div id="main-content">
-        <!-- 헤더 섹션 -->
         <header class="bg-blue-700 text-white py-8 shadow-lg relative">
-            <!-- 복귀 버튼: 다시 시작 화면을 보여줌 -->
             <button onclick="backToWelcome()" class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm transition-all flex items-center gap-2">
                 🏠 시작화면으로
             </button>
@@ -89,7 +121,6 @@
             </div>
         </header>
 
-        <!-- 상단 탭 네비게이션 -->
         <nav class="bg-white border-b sticky top-0 z-50 shadow-sm">
             <div class="container mx-auto px-4">
                 <ul class="flex overflow-x-auto whitespace-nowrap justify-center">
@@ -102,7 +133,6 @@
         </nav>
 
         <main class="container mx-auto px-4 py-8 max-w-5xl">
-            <!-- 1. 지리 섹션 -->
             <section id="geo" class="tab-content active space-y-8">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 card">
                     <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
@@ -121,11 +151,11 @@
                         </div>
                         <div class="space-y-4">
                             <div class="bg-blue-50 p-4 rounded-xl">
-                                <h3 class="font-bold text-blue-700 mb-2 font-bold">주소 안내</h3>
+                                <h3 class="font-bold text-blue-700 mb-2">주소 안내</h3>
                                 <p class="text-sm">경상북도 울릉군 울릉읍 독도리 (이사부길/안용복길)</p>
                             </div>
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <h3 class="font-bold text-slate-700 mb-2 font-bold">면적 정보</h3>
+                                <h3 class="font-bold text-slate-700 mb-2">면적 정보</h3>
                                 <p class="text-sm">전체 면적 187,554m² (잠실 운동장의 약 2배)</p>
                             </div>
                         </div>
@@ -133,32 +163,29 @@
                 </div>
             </section>
 
-            <!-- 2. 역사 섹션 (간략) -->
             <section id="history" class="tab-content space-y-8">
                 <div class="bg-white p-8 rounded-2xl border border-slate-200">
                     <h2 class="text-2xl font-bold text-indigo-800 mb-4">역사적 사료 핵심 요약</h2>
                     <p class="text-slate-600 mb-4">자세한 내용은 시작 화면의 '독도연표' 버튼을 통해 확인하실 수 있습니다.</p>
                     <div class="grid md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-indigo-50 rounded-xl font-bold">대한제국 칙령 제41호 (1900)</div>
-                        <div class="p-4 bg-indigo-50 rounded-xl font-bold">태정관 지령 (1877)</div>
+                        <div class="p-4 bg-indigo-50 rounded-xl font-bold border border-indigo-100">대한제국 칙령 제41호 (1900)</div>
+                        <div class="p-4 bg-indigo-50 rounded-xl font-bold border border-indigo-100">태정관 지령 (1877)</div>
                     </div>
                 </div>
             </section>
 
-            <!-- 3. 평화 섹션 -->
             <section id="peace" class="tab-content space-y-8">
                 <div class="bg-white p-8 rounded-2xl border border-slate-200">
                     <h2 class="text-2xl font-bold text-emerald-800 mb-4">갈등 해소와 평화</h2>
-                    <p class="text-slate-600">논리적인 무장과 평화적인 관점으로 동아시아의 공동 번영을 꿈꿉니다.</p>
+                    <p class="text-slate-600">정확한 지식과 논리적인 대응, 그리고 평화적인 관점으로 동아시아의 공동 번영을 실현합니다.</p>
                 </div>
             </section>
 
-            <!-- 4. 퀴즈 섹션 -->
             <section id="quiz" class="tab-content">
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
                     <h2 class="text-2xl font-bold mb-4">독도 지식 퀴즈</h2>
-                    <p class="mb-8 text-slate-500">배운 내용을 확인해 보세요!</p>
-                    <button onclick="alert('준비 중입니다!')" class="px-8 py-3 bg-blue-700 text-white rounded-xl font-bold">퀴즈 시작하기</button>
+                    <p class="mb-8 text-slate-500">지금까지 배운 내용을 확인해 볼까요?</p>
+                    <button class="px-8 py-3 bg-blue-700 text-white rounded-xl font-bold hover:bg-blue-800 transition shadow-lg">퀴즈 시작하기</button>
                 </div>
             </section>
         </main>
@@ -171,14 +198,38 @@
     </div>
 
     <script>
-        // 시작 화면 숨기기 (탐험 시작)
+        // --- 팝업 모달 로직 ---
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            
+            overlay.classList.add('active');
+            
+            if (type === 'image') {
+                content.innerHTML = `<img src="image.avif" alt="독도 인포그래픽" class="max-w-full max-h-[80vh] object-contain" onerror="this.src='https://via.placeholder.com/800x600?text=이미지+파일을+찾을+수+없습니다';">`;
+            } else if (type === 'video') {
+                content.innerHTML = `
+                    <video controls autoplay class="w-full max-h-[80vh] bg-black">
+                        <source src="dokdo_mp4_1.mp4" type="video/mp4">
+                        브라우저가 동영상을 지원하지 않습니다.
+                    </video>`;
+            }
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            overlay.classList.remove('active');
+            content.innerHTML = ''; // 리소스 정리
+        }
+
+        // --- 기본 네비게이션 로직 ---
         function startExploration() {
             const screen = document.getElementById('welcome-screen');
             screen.classList.add('fade-out');
             document.body.style.overflow = 'auto';
         }
 
-        // 시작 화면 보이기 (복귀 버튼)
         function backToWelcome() {
             const screen = document.getElementById('welcome-screen');
             screen.classList.remove('fade-out');
@@ -186,14 +237,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 초기 실행: 스크롤 방지
         window.onload = function() {
             if (!document.getElementById('welcome-screen').classList.contains('fade-out')) {
                 document.body.style.overflow = 'hidden';
             }
         }
 
-        // 탭 전환 로직
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
