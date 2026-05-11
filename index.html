@@ -3,119 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>독도용어 - 영역과 가치의 이해</title>
+    <title>독도 바로알기 통합 가이드</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
-        body { font-family: 'Noto Sans KR', sans-serif; }
-        .term-card { transition: all 0.3s ease; }
-        .term-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        body { font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* 시작 화면 애니메이션 설정 */
+        #welcome-screen {
+            transition: opacity 0.6s ease, visibility 0.6s;
+        }
+        .fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* 지도 및 카드 디자인 */
+        .map-container { position: relative; width: 100%; height: 300px; background: #e0f2fe; border-radius: 1rem; overflow: hidden; }
+        .island { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; transition: all 0.3s; cursor: pointer; }
+        .island:hover { transform: scale(1.1); }
+        .card { transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
-    <!-- Navigation -->
-    <nav class="bg-white border-b sticky top-0 z-50 p-4 shadow-sm">
-        <div class="container mx-auto flex justify-between items-center">
-            <!-- 경로 수정: 상위 폴더의 index.html로 확실히 연결 -->
-            <a href="../index.html" class="text-blue-700 font-bold flex items-center hover:text-blue-900 transition">
-                <span class="mr-2">←</span> 메인으로 돌아가기
-            </a>
-            <span class="text-slate-400 text-sm">독도 탐험 가이드: 용어 사전</span>
-        </div>
-    </nav>
 
-    <main class="container mx-auto px-4 py-12 max-w-5xl">
-        <header class="text-center mb-16">
-            <h1 class="text-4xl font-bold text-slate-900 mb-4">독도 관련 핵심 용어 사전</h1>
-            <p class="text-slate-600">독도의 주권과 가치를 이해하기 위한 필수 개념들을 정리했습니다.</p>
-        </div>
-
-        <!-- Section 1: 국가 영역 관련 용어 -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-blue-800 mb-8 flex items-center">
-                <span class="bg-blue-100 p-2 rounded-lg mr-3">🌐</span> 국가 영역의 이해
-            </h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">영토 (Territory)</h3>
-                    <p class="text-slate-600 leading-relaxed">국가의 주권이 미치는 지표상의 범위를 말합니다. 독도는 동도와 서도, 그리고 89개의 부속 도서로 이루어진 엄연한 대한민국의 영토입니다.</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">영해 (Territorial Sea)</h3>
-                    <p class="text-slate-600 leading-relaxed">해안선(기선)으로부터 주권이 미치는 바다의 범위입니다. 독도는 영해 및 접속수역법에 따라 기선으로부터 <strong>12해리</strong>(약 22km)까지를 영해로 설정합니다.</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">접속수역 (Contiguous Zone)</h3>
-                    <p class="text-slate-600 leading-relaxed">영해 외측에 인접한 수역으로, 관세·출입국 관리 등 특정 목적을 위해 국가 통제권을 행사할 수 있는 수역입니다. 영해 기선으로부터 <strong>24해리</strong> 이내의 수역을 의미합니다.</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">영공 (Territorial Airspace)</h3>
-                    <p class="text-slate-600 leading-relaxed">국가의 영토와 영해의 수직 상공을 의미하며, 보통 대기권 이내를 뜻합니다. 영공의 주권은 영토와 영해의 주권을 기반으로 합니다.</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card md:col-span-2">
-                    <h3 class="text-xl font-bold text-blue-700 mb-3">배타적 경제수역 (EEZ)</h3>
-                    <p class="text-slate-600 leading-relaxed">영해 기선으로부터 200해리까지의 수역 중 영해를 제외한 수역입니다. 연안국이 해양 자원의 탐사·개발·이용·보전 및 관리할 수 있는 독점적 권리를 가집니다. 독도 주변 수역은 한류와 난류가 만나는 풍부한 어장을 형성하고 있습니다.</p>
-                </div>
+    <!-- [1] 시작 화면 (Welcome Screen) -->
+    <div id="welcome-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-blue-900 overflow-hidden">
+        <!-- 배경 장식 요소 -->
+        <div class="absolute -top-20 -left-20 w-64 h-64 bg-blue-800 rounded-full opacity-50"></div>
+        <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-blue-700 rounded-full opacity-30"></div>
+        
+        <div class="relative z-10 text-center px-4">
+            <div class="mb-6 inline-block p-4 bg-white/10 rounded-full backdrop-blur-md">
+                <span class="text-6xl">🏝️</span>
             </div>
-        </section>
-
-        <!-- Section 2: 자연 환경 및 자원 -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-emerald-800 mb-8 flex items-center">
-                <span class="bg-emerald-100 p-2 rounded-lg mr-3">🌋</span> 자연 환경과 자원
-            </h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-lg font-bold text-emerald-700 mb-2">화산섬</h3>
-                    <p class="text-sm text-slate-600">약 460만~250만 년 전 화산 활동으로 형성되었습니다. 울릉도(약 250만 년 전)나 제주도(약 120만 년 전)보다 먼저 태어난 섬입니다.</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-lg font-bold text-emerald-700 mb-2">조면암</h3>
-                    <p class="text-sm text-slate-600">독도를 구성하는 주요 암석입니다. 울릉도와 지질학적으로 유사하여 두 섬이 해산의 형태로 연결되어 있음을 증명합니다.</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 term-card">
-                    <h3 class="text-lg font-bold text-emerald-700 mb-2">가스 하이드레이트</h3>
-                    <p class="text-sm text-slate-600">저온·고압 상태에서 천연가스와 물이 결합한 고체 에너지원입니다. 독도 인근에 약 6억 톤이 매장되어 있습니다.</p>
-                </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">독도 탐험 시작하기</h1>
+            <p class="text-blue-200 text-lg md:text-xl mb-12 max-w-2xl mx-auto">
+                지리적 특성부터 역사적 사료, 평화적 해결까지<br>
+                우리 땅 독도의 모든 것을 함께 알아볼까요?
+            </p>
+            
+            <!-- 버튼 그룹 -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <!-- 메인 콘텐츠 탐험 시작 -->
+                <button onclick="startExploration()" class="group relative px-10 py-5 bg-white text-blue-900 font-bold text-xl rounded-full shadow-2xl hover:bg-blue-50 transform hover:scale-105 transition-all duration-300">
+                    탐험 시작
+                    <span class="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                </button>
+                
+                <!-- 외부 페이지 링크 (01, 02 폴더) -->
+                <a href="./01/index.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
+                    📅 독도연표
+                </a>
+                
+                <a href="./02/02.html" class="px-10 py-5 bg-blue-700/50 text-white border-2 border-white/30 font-bold text-xl rounded-full backdrop-blur-sm shadow-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300">
+                    📖 독도용어
+                </a>
             </div>
-        </section>
+        </div>
+        
+        <!-- 하단 파도 효과 -->
+        <div class="absolute bottom-0 w-full overflow-hidden leading-[0]">
+            <svg class="relative block w-[calc(100%+1.3px)] h-[150px]" viewBox="0 0 1200 1200" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#F8FAFC"></path>
+            </svg>
+        </div>
+    </div>
 
-        <!-- Section 3: 독도의 다각적 가치 -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold text-indigo-800 mb-8 flex items-center">
-                <span class="bg-indigo-100 p-2 rounded-lg mr-3">💎</span> 독도의 3대 가치
-            </h2>
-            <div class="space-y-4">
-                <div class="flex flex-col md:flex-row bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                    <div class="bg-indigo-600 text-white p-6 md:w-48 flex items-center justify-center font-bold text-lg">지정학적</div>
-                    <div class="p-6 flex-1 text-slate-600">한반도와 일본, 러시아의 한가운데 위치한 중요한 방위 거점이자 해상 운송의 주요 통로, 선박의 긴급 대피소 역할을 합니다.</div>
-                </div>
-                <div class="flex flex-col md:flex-row bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                    <div class="bg-indigo-500 text-white p-6 md:w-48 flex items-center justify-center font-bold text-lg">경제적</div>
-                    <div class="p-6 flex-1 text-slate-600">한류와 난류가 만나는 조경 수역으로 어족 자원이 풍부한 황금어장이며, 가스 하이드레이트 등 미래 자원의 보고입니다.</div>
-                </div>
-                <div class="flex flex-col md:flex-row bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                    <div class="bg-indigo-400 text-white p-6 md:w-48 flex items-center justify-center font-bold text-lg">학술적</div>
-                    <div class="p-6 flex-1 text-slate-600">해양 기후 관측 및 어장 예보의 핵심지이며, 화산 섬의 생성과 변화 과정을 연구하기에 최적의 지질학 연구지입니다.</div>
-                </div>
+    <!-- [2] 메인 콘텐츠 영역 -->
+    <div id="main-content">
+        <!-- 헤더 섹션 -->
+        <header class="bg-blue-700 text-white py-8 shadow-lg relative">
+            <!-- 복귀 버튼: 다시 시작 화면을 보여줌 -->
+            <button onclick="backToWelcome()" class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm transition-all flex items-center gap-2">
+                🏠 시작화면으로
+            </button>
+
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-4xl font-bold mb-2">우리 땅, 독도 바로알기</h1>
+                <p class="text-blue-100">통합 학습 가이드 콘텐츠</p>
             </div>
-        </section>
+        </header>
 
-        <!-- Information Box -->
-        <div class="bg-blue-50 p-8 rounded-3xl border border-blue-100 text-center">
-            <p class="text-blue-800 font-bold mb-2">"아는 만큼 보이고, 보이는 만큼 지킬 수 있습니다."</p>
-            <p class="text-blue-600 text-sm">독도의 용어를 정확히 이해하는 것, 그것이 독도 수호의 첫걸음입니다.</p>
-        </div>
-    </main>
+        <!-- 상단 탭 네비게이션 -->
+        <nav class="bg-white border-b sticky top-0 z-50 shadow-sm">
+            <div class="container mx-auto px-4">
+                <ul class="flex overflow-x-auto whitespace-nowrap justify-center">
+                    <li><button onclick="showTab('geo')" class="tab-btn px-6 py-4 font-bold border-b-2 border-blue-700 text-blue-700" id="btn-geo">1. 지리적 특성</button></li>
+                    <li><button onclick="showTab('history')" class="tab-btn px-6 py-4 font-bold border-b-2 border-transparent text-slate-500 hover:text-blue-600" id="btn-history">2. 역사적 사료</button></li>
+                    <li><button onclick="showTab('peace')" class="tab-btn px-6 py-4 font-bold border-b-2 border-transparent text-slate-500 hover:text-blue-600" id="btn-peace">3. 갈등과 평화</button></li>
+                    <li><button onclick="showTab('quiz')" class="tab-btn px-6 py-4 font-bold border-b-2 border-transparent text-slate-500 hover:text-blue-600" id="btn-quiz">4. 자가 진단</button></li>
+                </ul>
+            </div>
+        </nav>
 
-    <footer class="bg-slate-100 border-t py-12">
-        <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
-            <p>&copy; 2024 독도 바로알기 교육 프로젝트</p>
-        </div>
-    </footer>
+        <main class="container mx-auto px-4 py-8 max-w-5xl">
+            <!-- 1. 지리 섹션 -->
+            <section id="geo" class="tab-content active space-y-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                        <span class="mr-2">📍</span> 독도의 위치와 환경
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="map-container flex items-center justify-center">
+                             <div class="relative w-full h-full p-10">
+                                 <div class="island bg-slate-400 w-16 h-16 top-20 left-10">육지</div>
+                                 <div class="island bg-blue-500 w-10 h-10 top-16 left-48">울릉</div>
+                                 <div class="island bg-red-500 w-6 h-6 top-28 left-72 shadow-lg animate-pulse">독도</div>
+                                 <div class="island bg-orange-400 w-10 h-10 bottom-10 right-10">오키</div>
+                                 <div class="absolute top-14 left-32 text-xs font-bold text-slate-600">87.4km</div>
+                                 <div class="absolute top-36 left-72 text-xs font-bold text-slate-600">157.5km</div>
+                             </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 p-4 rounded-xl">
+                                <h3 class="font-bold text-blue-700 mb-2 font-bold">주소 안내</h3>
+                                <p class="text-sm">경상북도 울릉군 울릉읍 독도리 (이사부길/안용복길)</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <h3 class="font-bold text-slate-700 mb-2 font-bold">면적 정보</h3>
+                                <p class="text-sm">전체 면적 187,554m² (잠실 운동장의 약 2배)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 역사 섹션 (간략) -->
+            <section id="history" class="tab-content space-y-8">
+                <div class="bg-white p-8 rounded-2xl border border-slate-200">
+                    <h2 class="text-2xl font-bold text-indigo-800 mb-4">역사적 사료 핵심 요약</h2>
+                    <p class="text-slate-600 mb-4">자세한 내용은 시작 화면의 '독도연표' 버튼을 통해 확인하실 수 있습니다.</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-indigo-50 rounded-xl font-bold">대한제국 칙령 제41호 (1900)</div>
+                        <div class="p-4 bg-indigo-50 rounded-xl font-bold">태정관 지령 (1877)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 평화 섹션 -->
+            <section id="peace" class="tab-content space-y-8">
+                <div class="bg-white p-8 rounded-2xl border border-slate-200">
+                    <h2 class="text-2xl font-bold text-emerald-800 mb-4">갈등 해소와 평화</h2>
+                    <p class="text-slate-600">논리적인 무장과 평화적인 관점으로 동아시아의 공동 번영을 꿈꿉니다.</p>
+                </div>
+            </section>
+
+            <!-- 4. 퀴즈 섹션 -->
+            <section id="quiz" class="tab-content">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <h2 class="text-2xl font-bold mb-4">독도 지식 퀴즈</h2>
+                    <p class="mb-8 text-slate-500">배운 내용을 확인해 보세요!</p>
+                    <button onclick="alert('준비 중입니다!')" class="px-8 py-3 bg-blue-700 text-white rounded-xl font-bold">퀴즈 시작하기</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-slate-100 border-t py-10 mt-12">
+            <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
+                <p>&copy; 2024 독도 바로알기 교육 플랫폼</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // 시작 화면 숨기기 (탐험 시작)
+        function startExploration() {
+            const screen = document.getElementById('welcome-screen');
+            screen.classList.add('fade-out');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 시작 화면 보이기 (복귀 버튼)
+        function backToWelcome() {
+            const screen = document.getElementById('welcome-screen');
+            screen.classList.remove('fade-out');
+            document.body.style.overflow = 'hidden';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 초기 실행: 스크롤 방지
+        window.onload = function() {
+            if (!document.getElementById('welcome-screen').classList.contains('fade-out')) {
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // 탭 전환 로직
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-700', 'text-blue-700');
+                btn.classList.add('border-transparent', 'text-slate-500');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('border-blue-700', 'text-blue-700');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
